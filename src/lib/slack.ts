@@ -9,6 +9,12 @@ export class SlackClient {
   async sendNotification(channels: InactiveChannel[]) {
     if (channels.length === 0) return;
 
+    // Slackのブロック数制限: 最大50ブロック
+    // 1チャンネルあたり2ブロック（section + divider）なので、最大20チャンネルまで
+    const maxChannels = 20;
+    const displayChannels = channels.slice(0, maxChannels);
+    const remainingCount = channels.length - maxChannels;
+
     const blocks = [
       {
         type: 'header',
@@ -22,7 +28,7 @@ export class SlackClient {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*${channels.length}個のチャンネル*で2日間以上更新が止まっています。`,
+          text: `*${channels.length}個のチャンネル*で2日間以上更新が止まっています。${remainingCount > 0 ? `\n（最初の${maxChannels}件を表示）` : ''}`,
         },
       },
       {
@@ -30,8 +36,8 @@ export class SlackClient {
       },
     ];
 
-    // Add each channel as a block
-    for (const channel of channels) {
+    // Add each channel as a block (up to maxChannels)
+    for (const channel of displayChannels) {
       blocks.push({
         type: 'section',
         text: {
@@ -46,6 +52,17 @@ export class SlackClient {
       
       blocks.push({
         type: 'divider',
+      });
+    }
+
+    // Add remaining count if there are more channels
+    if (remainingCount > 0) {
+      blocks.push({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `_... 他 ${remainingCount} 件のチャンネルがあります_`,
+        },
       });
     }
 
