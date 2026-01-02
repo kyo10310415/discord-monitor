@@ -1,0 +1,25 @@
+# Cloudflare Workers Cron Configuration
+# For Pages, deploy as a Worker with scheduled triggers
+
+name = "discord-monitor-cron"
+main = "src/index.tsx"
+compatibility_date = "2025-12-30"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron Trigger: 毎日 UTC 8:00 (JST 17:00)
+[triggers]
+crons = ["0 8 * * *"]
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "discord-monitor-db"
+database_id = "ec1a5e27-6c4b-43fb-a92a-e7b98d282461"
+
+# Environment Variables (set via wrangler secret)
+# DISCORD_BOT_TOKEN
+# SLACK_WEBHOOK_URL
+# GOOGLE_SERVICE_ACCOUNT_EMAIL
+# GOOGLE_PRIVATE_KEY
+# GOOGLE_SPREADSHEET_ID
+# GOOGLE_SHEET_NAME

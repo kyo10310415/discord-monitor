@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "discord-monitor",
+  "compatibility_date": "2025-12-30",
+  "pages_build_output_dir": "./dist",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "discord-monitor-db",
+      "database_id": "ec1a5e27-6c4b-43fb-a92a-e7b98d282461"
+    }
+  ]
+}
