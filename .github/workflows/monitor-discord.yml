@@ -2,9 +2,7 @@ name: Discord Monitor - Daily Check
 
 on:
   schedule:
-    # 1日3回実行（JST 9:00, 13:00, 17:00）
-    - cron: '0 0 * * *'   # UTC 00:00 = JST 09:00
-    - cron: '0 4 * * *'   # UTC 04:00 = JST 13:00
+    # 1日1回実行（JST 17:00）
     - cron: '0 8 * * *'   # UTC 08:00 = JST 17:00
   
   # 手動実行も可能にする
@@ -20,7 +18,7 @@ jobs:
           echo "Running Discord monitor check..."
           
           # 本番環境のAPIを呼び出し（Slack通知あり）
-          response=$(curl -s -X POST https://9c673827.discord-monitor.pages.dev/api/monitor/run)
+          response=$(curl -s -X POST https://a3e367e9.discord-monitor.pages.dev/api/monitor/run)
           
           echo "Response: $response"
           
