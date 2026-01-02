@@ -1,0 +1,36 @@
+name: Discord Monitor - Daily Check
+
+on:
+  schedule:
+    # 毎日 UTC 08:00 (JST 17:00) に実行
+    - cron: '0 8 * * *'
+  
+  # 手動実行も可能にする
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Call Discord Monitor API
+        run: |
+          echo "Running Discord monitor check..."
+          
+          # 本番環境のAPIを呼び出し（Slack通知あり）
+          response=$(curl -s -X POST https://9c673827.discord-monitor.pages.dev/api/monitor/run)
+          
+          echo "Response: $response"
+          
+          # 結果をチェック
+          if echo "$response" | grep -q '"channelsChecked"'; then
+            echo "✅ Monitor completed successfully"
+          else
+            echo "❌ Monitor failed"
+            exit 1
+          fi
+      
+      - name: Display summary
+        if: always()
+        run: |
+          echo "Monitor execution completed at $(date)"
