@@ -225,13 +225,14 @@ app.get('/', (c) => {
                         }
                         
                         return \`
-                            <div class="flex items-start space-x-3 p-3 border border-gray-200 rounded">
+                            <div class="flex items-start space-x-3 p-3 border border-gray-200 rounded \${log.inactive_count > 0 ? 'bg-red-50 border-red-300' : ''}">
                                 <i class="fas \${statusIcon} mt-1"></i>
                                 <div class="flex-1">
                                     <p class="text-sm text-gray-900">
                                         \${jstDate.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (JST) - 
                                         <span class="font-medium">\${log.channels_checked}</span>\u500b\u30c1\u30a7\u30c3\u30af\u3001
-                                        <span class="font-medium text-red-600">\${log.alerts_sent}</span>\u4ef6\u901a\u77e5
+                                        <span class="font-medium \${log.inactive_count > 0 ? 'text-red-600' : 'text-green-600'}">\${log.inactive_count || 0}\u500b</span>\u66f4\u65b0\u505c\u6b62\u3001
+                                        <span class="font-medium text-blue-600">\${log.alerts_sent}</span>\u4ef6\u901a\u77e5
                                     </p>
                                     \${errorHtml}
                                 </div>
@@ -444,7 +445,7 @@ app.get('/api/stats', async (c) => {
 // Get logs
 app.get('/api/logs', async (c) => {
   const result = await c.env.DB.prepare(
-    'SELECT * FROM check_logs ORDER BY checked_at DESC LIMIT 50'
+    'SELECT * FROM check_logs ORDER BY inactive_count DESC, checked_at DESC LIMIT 50'
   ).all();
   
   return c.json({ logs: result.results || [] });

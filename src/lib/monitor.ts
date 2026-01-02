@@ -164,14 +164,15 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
     
     // Log the check
     await env.DB.prepare(
-      `INSERT INTO check_logs (channels_checked, alerts_sent, status, error_message, channel_details)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO check_logs (channels_checked, alerts_sent, status, error_message, channel_details, inactive_count)
+       VALUES (?, ?, ?, ?, ?, ?)`
     ).bind(
       channelsChecked,
       alertsSent,
       errors.length > 0 ? 'partial' : 'success',
       errors.length > 0 ? errors.join('; ') : null,
-      errorDetails.length > 0 ? JSON.stringify(errorDetails) : null
+      errorDetails.length > 0 ? JSON.stringify(errorDetails) : null,
+      inactiveChannels.length
     ).run();
     
   } catch (err) {
@@ -179,9 +180,9 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
     
     // Log the failed check
     await env.DB.prepare(
-      `INSERT INTO check_logs (channels_checked, alerts_sent, status, error_message, channel_details)
-       VALUES (?, ?, 'error', ?, ?)`
-    ).bind(channelsChecked, alertsSent, errors.join('; '), null).run();
+      `INSERT INTO check_logs (channels_checked, alerts_sent, status, error_message, channel_details, inactive_count)
+       VALUES (?, ?, 'error', ?, ?, ?)`
+    ).bind(channelsChecked, alertsSent, errors.join('; '), null, 0).run();
   }
   
   return {
