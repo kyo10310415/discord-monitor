@@ -199,11 +199,33 @@ app.get('/', (c) => {
                         const jstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
                         
                         let errorHtml = '';
-                        if (log.channel_details) {
+                        
+                        // 優先順位1: 更新停止チャンネルを表示
+                        if (log.inactive_channels_details) {
+                            try {
+                                const inactiveChannels = JSON.parse(log.inactive_channels_details);
+                                if (inactiveChannels && inactiveChannels.length > 0) {
+                                    errorHtml = '<div class="mt-2 space-y-1 bg-yellow-50 p-2 rounded border border-yellow-200">' + 
+                                        '<div class="text-xs font-semibold text-yellow-800 mb-1">⚠️ 更新停止チャンネル:</div>' +
+                                        inactiveChannels.slice(0, 10).map(ch => 
+                                        \`<div class="text-xs"><span class="text-orange-700">\u2022 \${ch.studentName} (\${ch.studentId})</span> - 最終更新: \${new Date(ch.lastMessageAt).toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'})} <a href="\${ch.memoUrl}" target="_blank" class="text-blue-600 hover:underline ml-2"><i class="fas fa-external-link-alt"></i> \u30e1\u30e2\u3092\u958b\u304f</a></div>\`
+                                    ).join('');
+                                    if (inactiveChannels.length > 10) errorHtml += \`<div class="text-xs text-gray-600">\u2022 ... \u4ed6\${inactiveChannels.length - 10}\u4ef6</div>\`;
+                                    errorHtml += '</div>';
+                                }
+                            } catch (e) {
+                                console.error('Failed to parse inactive_channels_details:', e);
+                            }
+                        }
+                        
+                        // 優先順位2: エラー詳細を表示（更新停止チャンネルがない場合のみ）
+                        if (!errorHtml && log.channel_details) {
                             try {
                                 const details = JSON.parse(log.channel_details);
                                 if (details && details.length > 0) {
-                                    errorHtml = '<div class="mt-2 space-y-1">' + details.slice(0, 5).map(d => 
+                                    errorHtml = '<div class="mt-2 space-y-1">' + 
+                                        '<div class="text-xs font-semibold text-red-700 mb-1">エラー詳細:</div>' +
+                                        details.slice(0, 5).map(d => 
                                         \`<div class="text-xs"><span class="text-red-600">\u2022 \${d.studentName} (\${d.studentId}): \${d.error}</span> <a href="\${d.memoUrl}" target="_blank" class="text-blue-600 hover:underline"><i class="fas fa-external-link-alt"></i> \u30e1\u30e2\u3092\u958b\u304f</a></div>\`
                                     ).join('');
                                     if (details.length > 5) errorHtml += \`<div class="text-xs text-gray-500">\u2022 ... \u4ed6\${details.length - 5}\u4ef6</div>\`;
@@ -217,9 +239,11 @@ app.get('/', (c) => {
                                     errorHtml += '</div>';
                                 }
                             }
-                        } else if (log.error_message) {
+                        } else if (!errorHtml && log.error_message) {
                             const errors = log.error_message.split('; ').filter(e => e.trim());
-                            errorHtml = '<div class="mt-2 space-y-1">' + errors.slice(0, 5).map(err => \`<div class="text-xs text-red-600">\u2022 \${err}</div>\`).join('');
+                            errorHtml = '<div class="mt-2 space-y-1">' + 
+                                '<div class="text-xs font-semibold text-red-700 mb-1">エラー:</div>' +
+                                errors.slice(0, 5).map(err => \`<div class="text-xs text-red-600">\u2022 \${err}</div>\`).join('');
                             if (errors.length > 5) errorHtml += \`<div class="text-xs text-gray-500">\u2022 ... \u4ed6\${errors.length - 5}\u4ef6</div>\`;
                             errorHtml += '</div>';
                         }
