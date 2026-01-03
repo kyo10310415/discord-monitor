@@ -18,7 +18,7 @@ jobs:
           echo "Running Discord monitor check..."
           
           # 本番環境のAPIを呼び出し（Slack通知あり）
-          response=$(curl -s -X POST https://a3e367e9.discord-monitor.pages.dev/api/monitor/run)
+          response=$(curl -s -X POST https://discord-monitor.pages.dev/api/monitor/run)
           
           echo "Response: $response"
           
