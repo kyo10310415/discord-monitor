@@ -9,7 +9,7 @@
     "db:migrate": "tsx src/lib/init-db.ts"
   },
   "dependencies": {
-    "better-sqlite3": "^9.4.3",
+    "better-sqlite3": "^12.9.0",
     "hono": "^4.11.3",
     "@hono/node-server": "^1.13.7",
     "google-auth-library": "^9.15.1",
@@ -18,7 +18,7 @@
     "tsx": "^4.19.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.8",
+    "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.17.10",
     "@types/node-cron": "^3.0.11",
     "typescript": "^5.7.2"
