@@ -25,28 +25,23 @@ export class DiscordClient {
     return response.json();
   }
 
-  // Get all channels in a guild
   async getGuildChannels(guildId: string) {
     return this.fetch(`/guilds/${guildId}/channels`);
   }
 
-  // Get the last message in a channel
   async getChannelMessages(channelId: string, limit: number = 1) {
     return this.fetch(`/channels/${channelId}/messages?limit=${limit}`);
   }
 
-  // Get guild information
   async getGuild(guildId: string) {
     return this.fetch(`/guilds/${guildId}?with_counts=false`);
   }
 
-  // Get bot's guilds
   async getBotGuilds() {
     return this.fetch('/users/@me/guilds');
   }
 }
 
-// Types
 export interface DiscordChannel {
   id: string;
   name: string;

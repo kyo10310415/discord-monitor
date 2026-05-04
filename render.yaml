@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: discord-monitor
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/stats
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DB_PATH
+        value: /data/discord-monitor.db
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_PRIVATE_KEY
+        sync: false
+      - key: GOOGLE_SPREADSHEET_ID
+        sync: false
+      - key: GOOGLE_SHEET_NAME
+        sync: false

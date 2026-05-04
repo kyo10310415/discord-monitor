@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "skipLibCheck": true,
-    "lib": [
-      "ESNext"
-    ],
-    "types": ["vite/client"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2022"]
   },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
