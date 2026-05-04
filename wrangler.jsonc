@@ -6,14 +6,11 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "triggers": {
-    "crons": ["0 8 * * *"]
-  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "discord-monitor-db",
-      "database_id": "ec1a5e27-6c4b-43fb-a92a-e7b98d282461"
+      "database_id": "510563de-47ec-43b0-a03e-d48e247fc1c6"
     }
   ]
 }
