@@ -11,11 +11,14 @@ pids
 build
 dist
 
+# SQLite DB (Renderのディスクに保存)
+data/
+
 # dotenv environment variables file
 .env
 .dev.vars
 
-# Wrangler
+# Wrangler (削除済み)
 .wrangler/
 
 # PM2
@@ -36,3 +39,4 @@ logs/
 # IDE
 .vscode/
 .idea/
+core
