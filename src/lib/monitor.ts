@@ -135,7 +135,21 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
       }
     }
 
-    // ログ記録
+    // ログ記録（更新停止チャンネル + エラー詳細を両方保存）
+    const detailsPayload: {
+      inactive: Array<{ studentName: string; studentId: string; memoUrl: string; lastMessageAt: string | null }>;
+      errors: typeof errorDetails;
+    } = {
+      inactive: inactiveChannels.map(ch => ({
+        studentName: ch.studentName,
+        studentId: ch.studentId,
+        memoUrl: ch.memoUrl,
+        lastMessageAt: ch.lastMessageAt,
+      })),
+      errors: errorDetails,
+    };
+    const hasDetails = detailsPayload.inactive.length > 0 || detailsPayload.errors.length > 0;
+
     db.prepare(`
       INSERT INTO check_logs (channels_checked, alerts_sent, status, error_message, channel_details)
       VALUES (?, ?, ?, ?, ?)
@@ -144,7 +158,7 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
       alertsSent,
       errors.length > 0 ? 'partial' : 'success',
       errors.length > 0 ? errors.join('; ') : null,
-      errorDetails.length > 0 ? JSON.stringify(errorDetails) : null
+      hasDetails ? JSON.stringify(detailsPayload) : null
     );
 
   } catch (err) {

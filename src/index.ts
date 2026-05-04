@@ -160,6 +160,17 @@ app.get('/', (c) => {
                 } catch (e) { console.error(e); }
             }
 
+            function formatDate(dateStr) {
+                if (!dateStr) return '不明';
+                const date = new Date(dateStr);
+                const now = new Date();
+                const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                const dateLabel = date.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+                if (diffDays === 0) return \`今日 (\${dateLabel})\`;
+                if (diffDays === 1) return \`昨日 (\${dateLabel})\`;
+                return \`\${diffDays}日前 (\${dateLabel})\`;
+            }
+
             async function loadLogs() {
                 try {
                     const response = await axios.get('/api/logs');
@@ -169,41 +180,135 @@ app.get('/', (c) => {
                         listEl.innerHTML = '<p class="text-gray-500 text-center py-8">ログがありません</p>';
                         return;
                     }
-                    listEl.innerHTML = logs.map(log => {
+                    listEl.innerHTML = logs.map((log, idx) => {
                         const statusIcon = log.status === 'success' ? 'fa-check-circle text-green-600' :
                                           log.status === 'error'   ? 'fa-times-circle text-red-600' :
                                                                      'fa-exclamation-circle text-yellow-600';
                         const date = new Date(log.checked_at);
+                        const dateStr = date.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+
+                        let inactiveHtml = '';
                         let errorHtml = '';
+
                         if (log.channel_details) {
                             try {
                                 const details = JSON.parse(log.channel_details);
-                                if (details && details.length > 0) {
-                                    errorHtml = '<div class="mt-2 space-y-1">' +
-                                        details.slice(0, 5).map(d =>
-                                            \`<div class="text-xs"><span class="text-red-600">• \${d.studentName} (\${d.studentId}): \${d.error}</span>
-                                            <a href="\${d.memoUrl}" target="_blank" class="text-blue-600 hover:underline ml-1"><i class="fas fa-external-link-alt"></i> メモを開く</a></div>\`
-                                        ).join('');
-                                    if (details.length > 5) errorHtml += \`<div class="text-xs text-gray-500">• ... 他\${details.length - 5}件</div>\`;
-                                    errorHtml += '</div>';
+
+                                // 新形式: { inactive: [...], errors: [...] }
+                                if (details && typeof details === 'object' && !Array.isArray(details)) {
+                                    const inactive = details.inactive || [];
+                                    const errors = details.errors || [];
+
+                                    if (inactive.length > 0) {
+                                        inactiveHtml = \`
+                                            <div class="mt-2">
+                                                <button onclick="toggleDetail('inactive-\${idx}')"
+                                                    class="text-xs font-medium text-orange-600 hover:text-orange-800 flex items-center gap-1">
+                                                    <i class="fas fa-chevron-right transition-transform" id="icon-inactive-\${idx}"></i>
+                                                    更新停止 \${inactive.length}件
+                                                </button>
+                                                <div id="inactive-\${idx}" class="hidden mt-2 space-y-1 pl-3 border-l-2 border-orange-200">
+                                                    \${inactive.map(ch => \`
+                                                        <div class="text-xs bg-orange-50 rounded p-2">
+                                                            <span class="font-medium text-orange-800">👤 \${ch.studentName}</span>
+                                                            <span class="text-gray-500 ml-1">(\${ch.studentId})</span>
+                                                            <br>
+                                                            <span class="text-gray-600">最終更新: \${formatDate(ch.lastMessageAt)}</span>
+                                                            <a href="\${ch.memoUrl}" target="_blank"
+                                                                class="text-blue-600 hover:underline ml-2 text-xs">
+                                                                <i class="fas fa-external-link-alt"></i> メモを開く
+                                                            </a>
+                                                        </div>
+                                                    \`).join('')}
+                                                </div>
+                                            </div>\`;
+                                    }
+
+                                    if (errors.length > 0) {
+                                        errorHtml = \`
+                                            <div class="mt-2">
+                                                <button onclick="toggleDetail('error-\${idx}')"
+                                                    class="text-xs font-medium text-red-600 hover:text-red-800 flex items-center gap-1">
+                                                    <i class="fas fa-chevron-right transition-transform" id="icon-error-\${idx}"></i>
+                                                    エラー \${errors.length}件
+                                                </button>
+                                                <div id="error-\${idx}" class="hidden mt-2 space-y-1 pl-3 border-l-2 border-red-200">
+                                                    \${errors.map(d => \`
+                                                        <div class="text-xs bg-red-50 rounded p-2">
+                                                            <span class="font-medium text-red-700">👤 \${d.studentName} (\${d.studentId})</span>
+                                                            <br>
+                                                            <span class="text-red-600">\${d.error}</span>
+                                                            <a href="\${d.memoUrl}" target="_blank"
+                                                                class="text-blue-600 hover:underline ml-2 text-xs">
+                                                                <i class="fas fa-external-link-alt"></i> メモを開く
+                                                            </a>
+                                                        </div>
+                                                    \`).join('')}
+                                                </div>
+                                            </div>\`;
+                                    }
+
+                                // 旧形式: 配列（エラーのみ）
+                                } else if (Array.isArray(details) && details.length > 0) {
+                                    errorHtml = \`
+                                        <div class="mt-2">
+                                            <button onclick="toggleDetail('error-\${idx}')"
+                                                class="text-xs font-medium text-red-600 hover:text-red-800 flex items-center gap-1">
+                                                <i class="fas fa-chevron-right transition-transform" id="icon-error-\${idx}"></i>
+                                                エラー \${details.length}件
+                                            </button>
+                                            <div id="error-\${idx}" class="hidden mt-2 space-y-1 pl-3 border-l-2 border-red-200">
+                                                \${details.map(d => \`
+                                                    <div class="text-xs bg-red-50 rounded p-2">
+                                                        <span class="text-red-600">• \${d.studentName} (\${d.studentId}): \${d.error}</span>
+                                                        <a href="\${d.memoUrl}" target="_blank"
+                                                            class="text-blue-600 hover:underline ml-1">
+                                                            <i class="fas fa-external-link-alt"></i> メモを開く
+                                                        </a>
+                                                    </div>
+                                                \`).join('')}
+                                            </div>
+                                        </div>\`;
                                 }
                             } catch (e) {}
                         }
+
+                        const inactiveCount = (() => {
+                            try {
+                                const d = log.channel_details ? JSON.parse(log.channel_details) : null;
+                                if (d && !Array.isArray(d)) return (d.inactive || []).length;
+                            } catch(e) {}
+                            return 0;
+                        })();
+
                         return \`
-                            <div class="flex items-start space-x-3 p-3 border border-gray-200 rounded">
-                                <i class="fas \${statusIcon} mt-1"></i>
-                                <div class="flex-1">
-                                    <p class="text-sm text-gray-900">
-                                        \${date.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (JST) -
-                                        <span class="font-medium">\${log.channels_checked}</span>個チェック、
-                                        <span class="font-medium text-red-600">\${log.alerts_sent}</span>件通知
-                                    </p>
-                                    \${errorHtml}
+                            <div class="p-3 border border-gray-200 rounded">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas \${statusIcon} mt-1 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">
+                                            \${dateStr} (JST) &nbsp;|&nbsp;
+                                            <span class="font-medium">\${log.channels_checked}</span>個チェック &nbsp;|&nbsp;
+                                            <span class="font-medium text-orange-600">\${inactiveCount}</span>件更新停止 &nbsp;|&nbsp;
+                                            <span class="font-medium text-indigo-600">\${log.alerts_sent}</span>件Slack通知
+                                        </p>
+                                        \${inactiveHtml}
+                                        \${errorHtml}
+                                    </div>
                                 </div>
                             </div>
                         \`;
                     }).join('');
                 } catch (e) { console.error(e); }
+            }
+
+            function toggleDetail(id) {
+                const el = document.getElementById(id);
+                const icon = document.getElementById('icon-' + id);
+                if (!el) return;
+                const isHidden = el.classList.contains('hidden');
+                el.classList.toggle('hidden');
+                if (icon) icon.style.transform = isHidden ? 'rotate(90deg)' : '';
             }
 
             async function runMonitor() {
