@@ -52,5 +52,8 @@ export function initDb(): void {
   db.close();
 }
 
-// 直接実行された場合にマイグレーション実行
-initDb();
+// 直接実行された場合のみマイグレーション実行（importされた場合は実行しない）
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isMain) {
+  initDb();
+}

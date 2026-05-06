@@ -404,7 +404,7 @@ app.post('/api/monitor/test', async (c) => {
 // DB初期化
 initDb();
 
-const PORT = parseInt(process.env.PORT || '3000');
+const PORT = parseInt(process.env.PORT || '10000');
 
 serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
