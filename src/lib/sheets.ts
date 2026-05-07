@@ -42,7 +42,7 @@ export class GoogleSheetsClient {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const range = `${this.sheetName}!A:C`;
+    const range = `${this.sheetName}!A:D`;
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: this.spreadsheetId,

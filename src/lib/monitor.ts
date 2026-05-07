@@ -44,13 +44,13 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
     // Google Sheetsからデータ取得
     const sheetData = await sheets.getSheetData();
 
-    // ヘッダー行スキップ、C列が空の行スキップ
+    // ヘッダー行スキップ、D列(index=3)が空の行スキップ
     const studentChannels: StudentChannelInfo[] = [];
     for (let i = 1; i < sheetData.length; i++) {
       const row = sheetData[i];
       const studentName = row[0] || '';
       const studentId = row[1] || '';
-      const memoUrl = row[2] || '';
+      const memoUrl = row[3] || '';  // D列
 
       if (!memoUrl) continue;
 

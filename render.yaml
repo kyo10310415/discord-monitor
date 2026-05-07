@@ -29,4 +29,4 @@ services:
       - key: GOOGLE_SPREADSHEET_ID
         sync: false
       - key: GOOGLE_SHEET_NAME
-        sync: false
+        value: アラート対象者
