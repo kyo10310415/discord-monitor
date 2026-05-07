@@ -416,6 +416,16 @@ cron.schedule('0 8 * * *', async () => {
   try {
     const result = await monitorChannels(getEnv());
     console.log(`[Cron] Done: checked=${result.channelsChecked}, alerts=${result.alertsSent}, errors=${result.errors.length}`);
+    if (result.errors.length > 0) {
+      console.log(`[Cron] First 5 errors:`);
+      result.errors.slice(0, 5).forEach((e, i) => console.log(`  [${i+1}] ${e}`));
+    }
+    if (result.inactiveChannels.length > 0) {
+      console.log(`[Cron] Inactive channels (${result.inactiveChannels.length}):`);
+      result.inactiveChannels.slice(0, 5).forEach((ch, i) =>
+        console.log(`  [${i+1}] ${ch.studentName} (${ch.studentId}) lastMsg=${ch.lastMessageAt}`)
+      );
+    }
   } catch (e) {
     console.error('[Cron] Error:', e);
   }

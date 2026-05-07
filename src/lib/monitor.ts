@@ -3,6 +3,8 @@ import { SlackClient, InactiveChannel } from './slack.js';
 import { GoogleSheetsClient, parseDiscordChannelUrl, StudentChannelInfo } from './sheets.js';
 import { getDb } from './init-db.js';
 
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+
 export interface Env {
   DISCORD_BOT_TOKEN: string;
   SLACK_WEBHOOK_URL: string;
@@ -64,6 +66,13 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
     // 各チャンネルを監視
     for (const student of studentChannels) {
       channelsChecked++;
+
+      // レート制限対策: 50件ごとに1秒待機、毎リクエスト間200ms待機
+      if (channelsChecked > 1) await sleep(200);
+      if (channelsChecked % 50 === 0) {
+        console.log(`[Monitor] Progress: ${channelsChecked}/${studentChannels.length}, inactive=${inactiveChannels.length}, errors=${errors.length}`);
+        await sleep(1000);
+      }
 
       try {
         const messages = await discord.getChannelMessages(student.channelId);
