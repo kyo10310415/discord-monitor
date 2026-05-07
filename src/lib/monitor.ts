@@ -124,7 +124,7 @@ export async function monitorChannels(env: Env, options: MonitorOptions = {}): P
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
-        errors.push(`Channel ${student.channelId} (${student.studentName}): ${errorMsg}`);
+        errors.push(`Server ${student.serverId} / Channel ${student.channelId} (${student.studentName}): ${errorMsg}`);
         errorDetails.push({
           studentName: student.studentName,
           studentId: student.studentId,
