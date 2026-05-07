@@ -379,11 +379,21 @@ app.get('/api/logs', (c) => {
   }
 });
 
+function logResult(label: string, result: { channelsChecked: number; alertsSent: number; errors: string[]; inactiveChannels: any[] }) {
+  console.log(`[${label}] Done: checked=${result.channelsChecked}, alerts=${result.alertsSent}, inactive=${result.inactiveChannels.length}, errors=${result.errors.length}`);
+  if (result.errors.length > 0) {
+    console.log(`[${label}] Errors (first 10):`);
+    result.errors.slice(0, 10).forEach((e, i) => console.log(`  [${i+1}] ${e}`));
+  }
+}
+
 app.post('/api/monitor/run', async (c) => {
   try {
     const result = await monitorChannels(getEnv());
+    logResult('RUN', result);
     return c.json(result);
   } catch (e) {
+    console.error('[RUN] Fatal error:', e);
     return c.json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
@@ -391,8 +401,10 @@ app.post('/api/monitor/run', async (c) => {
 app.post('/api/monitor/test', async (c) => {
   try {
     const result = await monitorChannels(getEnv(), { skipSlackNotification: true });
+    logResult('TEST', result);
     return c.json(result);
   } catch (e) {
+    console.error('[TEST] Fatal error:', e);
     return c.json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
