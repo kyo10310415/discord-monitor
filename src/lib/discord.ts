@@ -42,7 +42,7 @@ export class DiscordClient {
     return this.fetch(`/guilds/${guildId}/channels`);
   }
 
-  async getChannelMessages(channelId: string, limit: number = 1) {
+  async getChannelMessages(channelId: string, limit: number = 1): Promise<DiscordMessage[]> {
     return this.fetch(`/channels/${channelId}/messages?limit=${limit}`);
   }
 
