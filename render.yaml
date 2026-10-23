@@ -6,12 +6,20 @@ services:
     nodeVersion: "20.19.1"
     buildCommand: npm install
     startCommand: npm start
-    healthCheckPath: /api/stats
+    healthCheckPath: /health
     disk:
       name: data
       mountPath: /data
       sizeGB: 1
     envVars:
+      - key: MONITOR_ADMIN_USERNAME
+        sync: false
+      - key: MONITOR_ADMIN_PASSWORD
+        sync: false
+      - key: MONITOR_JOB_TOKEN
+        sync: false
+      - key: MONITOR_PUBLIC_ORIGIN
+        sync: false
       - key: NODE_ENV
         value: production
       - key: PORT

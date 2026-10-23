@@ -8,27 +8,28 @@ on:
   # 手動実行も可能にする
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
     
     steps:
       - name: Call Discord Monitor API
+        env:
+          MONITOR_JOB_TOKEN: ${{ secrets.MONITOR_JOB_TOKEN }}
+          MONITOR_BASE_URL: ${{ vars.MONITOR_BASE_URL || 'https://discord-monitor-pkoh.onrender.com' }}
         run: |
+          set -euo pipefail
+          test -n "$MONITOR_JOB_TOKEN" || { echo "MONITOR_JOB_TOKEN is required"; exit 1; }
           echo "Running Discord monitor check..."
-          
-          # 本番環境のAPIを呼び出し（Slack通知あり）
-          response=$(curl -s -X POST https://discord-monitor-pkoh.onrender.com/api/monitor/run)
-          
-          echo "Response: $response"
-          
-          # 結果をチェック
-          if echo "$response" | grep -q '"channelsChecked"'; then
-            echo "✅ Monitor completed successfully"
-          else
-            echo "❌ Monitor failed"
-            exit 1
-          fi
+          response_file=$(mktemp)
+          trap 'rm -f "$response_file"' EXIT
+          printf 'Authorization: Bearer %s\n' "$MONITOR_JOB_TOKEN" |
+            curl --fail --silent --show-error --max-time 180 --request POST \
+              --header @- --output "$response_file" "${MONITOR_BASE_URL%/}/api/jobs/monitor"
+          jq -e '[.channelsChecked, .alertsSent, .inactiveCount, .errorCount] | all(.[]; type == "number")' "$response_file" > /dev/null
+          echo "Monitor completed successfully"
       
       - name: Display summary
         if: always()
