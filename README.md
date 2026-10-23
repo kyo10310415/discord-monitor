@@ -338,3 +338,6 @@ Node.js 22.23.4でnpm ci --ignore-scripts、アクセス制御の6回帰テス�
 ### 定期実行ライブラリの更新（2026-10-23）
 node-cronを4.6.0へ更新し、不要になった外部型定義を削除しました。内蔵型定義を使用します。既存の毎日08:00 UTC（17:00 JST）の式・timezone・起動設定は維持しています。v4ではscheduled/runOnInit/recoverMissedExecutionsが廃止されますが、このアプリは使用していません。Node22.23.4で6認可テスト・型ビルド、UTC次回予定時刻とstart/stop/destroyを確認。ジョブ本体は実行していません。
 公式移行情報: https://www.nodecron.com/migrating-from-v3.html
+
+### Googleクライアント更新（2026-10-23）
+googleapis150.0.1とgoogle-auth-library10.5.0に固定しました。直接の認証ライブラリはgoogleapis-commonの内包版と合わせ、型の不一致を防いでいます。Google関連の旧uuid依存を除去し、事前リリース版は含みません。既存6件＋実GoogleAuth/生成した使い捨て鍵と隔離transportによる成功・空・失敗3件の計9テスト、型buildが成功。実Google通信・本番資格情報・DB・監視・通知は使用していません。production auditはCritical/High/Moderate0、esbuild Low1のみ残存。
