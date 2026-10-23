@@ -113,7 +113,7 @@ Googleスプレッドシートから監視対象を取得し、2日間以上更�
 
 ```bash
 # 1. 依存関係のインストール
-npm install
+npm ci
 
 # 2. 環境変数の設定（.dev.vars）
 DISCORD_BOT_TOKEN=your-discord-token
@@ -320,3 +320,11 @@ MIT License
 
 **最終更新**: 2026-01-02
 **デプロイステータス**: ✅ ローカルテスト完了
+
+## Node.js・再現可能な依存導入（SEC-034/035）
+
+実行版はNode.js 22.23.4（22系の同版以上）です。.node-versionとRender定義を更新し、package.jsonにも>=22.23.4 <23を指定しています。RenderでNODE_VERSIONを別途設定している場合は同版にそろえ、デプロイログで実版を確認してください。
+
+依存導入はnpm ciを使用します。以前のlockfileはbetter-sqlite3 9系・tsxのdev配置等がmanifestと一致していませんでした。既存manifestのbetter-sqlite3 12系とruntime tsxを維持してlockfileを再生成し、@types/nodeを22系へ合わせました。DBスキーマ・認証設定は変更していません。better-sqlite3のnativeバイナリは新実行版/配備OSに合わせた再導入が必要です。
+
+隔離検証はnpm ci --ignore-scriptsで行い、native install scriptは実行していません。アクセス制御の6回帰テストと型ビルドを確認します。実SQLiteの読書き・本番Discord/Google通信は別途認証後の検証対象です。
