@@ -3,8 +3,8 @@ services:
     name: discord-monitor
     runtime: node
     plan: free
-    nodeVersion: "20.19.1"
-    buildCommand: npm install
+    nodeVersion: "22.23.4"
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
     disk:
