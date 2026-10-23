@@ -328,3 +328,9 @@ MIT License
 依存導入はnpm ciを使用します。以前のlockfileはbetter-sqlite3 9系・tsxのdev配置等がmanifestと一致していませんでした。既存manifestのbetter-sqlite3 12系とruntime tsxを維持してlockfileを再生成し、@types/nodeを22系へ合わせました。DBスキーマ・認証設定は変更していません。better-sqlite3のnativeバイナリは新実行版/配備OSに合わせた再導入が必要です。
 
 隔離検証はnpm ci --ignore-scriptsで行い、native install scriptは実行していません。アクセス制御の6回帰テストと型ビルドを確認します。実SQLiteの読書き・本番Discord/Google通信は別途認証後の検証対象です。
+
+### 依存警告の追加対応（2026-10-23）
+
+既存のバージョン範囲内でlockfileのHonoを4.11.3から4.13.13へ、@hono/node-serverを1.19.7から1.19.17へ更新しました。manifest、環境変数、DBスキーマ、better-sqlite3のバージョンは変更していません。関連する公式情報は[Nodeアダプターの静的パス認可回避](https://github.com/advisories/GHSA-wc8c-qw6v-h7f6)を参照してください。アプリでの攻撃成立は本番環境で試していません。
+
+Node.js 22.23.4でnpm ci --ignore-scripts、アクセス制御の6回帰テスト、型ビルドが成功しました。npm audit --omit=devの警告はHigh 2件・Moderate 6件・Low 1件からHigh 0件・Moderate 6件・Low 1件になりました。残る警告は別途対応対象であり、警告件数は実際の悪用可能性を表しません。実SQLiteの読書き、監視、外部通知はこの検証では実行していません。
