@@ -334,3 +334,7 @@ MIT License
 既存のバージョン範囲内でlockfileのHonoを4.11.3から4.13.13へ、@hono/node-serverを1.19.7から1.19.17へ更新しました。manifest、環境変数、DBスキーマ、better-sqlite3のバージョンは変更していません。関連する公式情報は[Nodeアダプターの静的パス認可回避](https://github.com/advisories/GHSA-wc8c-qw6v-h7f6)を参照してください。アプリでの攻撃成立は本番環境で試していません。
 
 Node.js 22.23.4でnpm ci --ignore-scripts、アクセス制御の6回帰テスト、型ビルドが成功しました。npm audit --omit=devの警告はHigh 2件・Moderate 6件・Low 1件からHigh 0件・Moderate 6件・Low 1件になりました。残る警告は別途対応対象であり、警告件数は実際の悪用可能性を表しません。実SQLiteの読書き、監視、外部通知はこの検証では実行していません。
+
+### 定期実行ライブラリの更新（2026-10-23）
+node-cronを4.6.0へ更新し、不要になった外部型定義を削除しました。内蔵型定義を使用します。既存の毎日08:00 UTC（17:00 JST）の式・timezone・起動設定は維持しています。v4ではscheduled/runOnInit/recoverMissedExecutionsが廃止されますが、このアプリは使用していません。Node22.23.4で6認可テスト・型ビルド、UTC次回予定時刻とstart/stop/destroyを確認。ジョブ本体は実行していません。
+公式移行情報: https://www.nodecron.com/migrating-from-v3.html
