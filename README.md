@@ -334,3 +334,11 @@ MIT License
 既存のバージョン範囲内でlockfileのHonoを4.11.3から4.13.13へ、@hono/node-serverを1.19.7から1.19.17へ更新しました。manifest、環境変数、DBスキーマ、better-sqlite3のバージョンは変更していません。関連する公式情報は[Nodeアダプターの静的パス認可回避](https://github.com/advisories/GHSA-wc8c-qw6v-h7f6)を参照してください。アプリでの攻撃成立は本番環境で試していません。
 
 Node.js 22.23.4でnpm ci --ignore-scripts、アクセス制御の6回帰テスト、型ビルドが成功しました。npm audit --omit=devの警告はHigh 2件・Moderate 6件・Low 1件からHigh 0件・Moderate 6件・Low 1件になりました。残る警告は別途対応対象であり、警告件数は実際の悪用可能性を表しません。実SQLiteの読書き、監視、外部通知はこの検証では実行していません。
+
+### 推移依存の追加対応（2026-10-23）
+
+既存範囲内でqsを6.15.1から6.16.1へ更新し、同版が要求するside-channelも1.1.0から1.1.1へ更新しました。その他の依存、manifest、環境変数、DBは変更していません。Node.js 22.23.4でnpm ci --ignore-scripts、アクセス制御6テスト、型ビルドが成功しました。npm audit --omit=devはCritical/High 0件、Moderate 5件、Low 1件です。
+
+qsの公式情報: [CVE-2026-8723](https://github.com/advisories/GHSA-q8mj-m7cp-5q26)、[CVE-2026-82562](https://github.com/advisories/GHSA-x5fp-wj9c-mxmx)、[CVE-2026-82417](https://github.com/advisories/GHSA-4mjr-xmp4-gh2g)。Google API依存ではqs.stringifyを使用していますが、公開入力による攻撃成立は確認していません。
+
+残るuuidの[CVE-2026-41907](https://github.com/advisories/GHSA-w5hq-g745-h8pq)はv3/v5/v6への出力バッファー指定が条件です。node-cron、gaxios、googleapis-commonの確認した呼出しはv4のみで、この条件への到達経路は検出していません。警告解消に必要なGoogle API・cronのメジャー更新は別途互換性検証が必要です。esbuildの[Windows開発サーバー問題](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr)は修正版0.28.1がtsxの現在の依存範囲外のため維持しました。アプリにesbuild開発サーバー使用経路は見つかっていません。依存警告の残存と実際の悪用可能性は区別してください。本番通信・監視・通知・SQLite操作は実行していません。
