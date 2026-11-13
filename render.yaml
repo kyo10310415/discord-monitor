@@ -2,14 +2,14 @@ services:
   - type: web
     name: discord-monitor
     runtime: node
-    plan: free
-    nodeVersion: "22.23.4"
+    plan: starter
+    nodeVersion: "22.23.5"
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
     disk:
-      name: data
-      mountPath: /data
+      name: disk
+      mountPath: /opt/render/project/src/data
       sizeGB: 1
     envVars:
       - key: MONITOR_ADMIN_USERNAME
@@ -25,7 +25,7 @@ services:
       - key: PORT
         value: 10000
       - key: DB_PATH
-        value: /data/discord-monitor.db
+        value: /opt/render/project/src/data/discord-monitor.db
       - key: DISCORD_BOT_TOKEN
         sync: false
       - key: SLACK_WEBHOOK_URL
